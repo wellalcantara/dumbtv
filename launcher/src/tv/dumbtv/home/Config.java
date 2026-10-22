@@ -102,7 +102,19 @@ final class Config {
             new String[] {"off", "visit", "hourly", "daily", "daytime"},
             new String[] {"Off", "Every return home", "Every hour", "Every day", "By time of day"});
 
-    static final Choice[] CHOICES = {ACCENT, TILES, LAYOUT, LABELS, CLOCK, INPUTS, SWITCH, BACKGROUND, DIM, ROTATE};
+    static final Choice FACE = new Choice("clockface", "Clock style", "classic",
+            new String[] {"classic", "large"},
+            new String[] {"Classic", "Large"});
+    /** Shown only while dumbtv weather (weather/) is installed and has a forecast. */
+    static final Choice WEATHER = new Choice("weather", "Weather", "on",
+            new String[] {"on", "off"},
+            new String[] {"Shown", "Hidden"});
+    static final Choice CREDIT = new Choice("credit", "Weather credit", "on",
+            new String[] {"on", "off"},
+            new String[] {"Shown", "Hidden"});
+
+    static final Choice[] CHOICES = {ACCENT, TILES, LAYOUT, LABELS, CLOCK, FACE, INPUTS, SWITCH, BACKGROUND, DIM,
+            ROTATE, WEATHER, CREDIT};
 
     /** Folder of wallpapers, next to home.conf, that Background › Image file rotates through. */
     static final String WALLPAPERS = "wallpapers";

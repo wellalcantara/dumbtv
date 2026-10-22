@@ -37,7 +37,8 @@ Um papel de parede: chame o arquivo de wallpaper.jpg (ou .png) e coloque nessa p
 Vários papéis de parede: coloque em %2$s/ com qualquer nome e escolha um rodízio
 Depois escolha Fundo › Imagem ou Tom adaptativo sobre a imagem. Nenhuma permissão é necessária
 Tom adaptativo sobre a imagem mostra grafite até você adicionar uma imagem
-Sem permissão de internet. Sem rastreamento, sem anúncios, sem contas.</string>
+Sem permissão de internet. Sem rastreamento, sem anúncios, sem contas.
+Dados do clima: Open-Meteo.com, CC BY 4.0, buscados pelo app separado dumbtv weather.</string>
 
     <string name="opt_accent">Cor de destaque</string>
     <string-array name="opt_accent_names">
@@ -82,4 +83,31 @@ Sem permissão de internet. Sem rastreamento, sem anúncios, sem contas.</string
         <item>Desligado</item><item>A cada volta ao início</item><item>A cada hora</item>
         <item>A cada dia</item><item>Pelo período do dia</item>
     </string-array>
+
+    <string name="opt_clockface">Estilo do relógio</string>
+    <string-array name="opt_clockface_names">
+        <item>Clássico</item><item>Grande</item>
+    </string-array>
+    <string name="opt_weather">Clima</string>
+    <string-array name="opt_weather_names">
+        <item>Visível</item><item>Oculto</item>
+    </string-array>
+    <string name="opt_credit">Crédito do clima</string>
+    <string-array name="opt_credit_names">
+        <item>Visível</item><item>Oculto</item>
+    </string-array>
+    <string name="wx_max">Máx %1$d°</string>
+    <string name="wx_min">Mín %1$d°</string>
+    <string name="wx_hour_24">%1$dh</string>
+    <string name="wx_sunny">Ensolarado</string>
+    <string name="wx_clear">Céu limpo</string>
+    <string name="wx_mostly_clear">Poucas nuvens</string>
+    <string name="wx_partly_cloudy">Parcialmente nublado</string>
+    <string name="wx_overcast">Nublado</string>
+    <string name="wx_fog">Neblina</string>
+    <string name="wx_drizzle">Garoa</string>
+    <string name="wx_rain">Chuva</string>
+    <string name="wx_showers">Pancadas de chuva</string>
+    <string name="wx_snow">Neve</string>
+    <string name="wx_storm">Tempestade</string>
 </resources>

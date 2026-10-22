@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  dumbtv weather: fetches a forecast from Open-Meteo for dumbtv home, which has no internet
+  permission of its own. No activity, no service, no background schedule: the launcher asks
+  this provider while the home screen is open, and a stale forecast is refreshed then.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="tv.dumbtv.weather">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:label="dumbtv weather"
+        android:allowBackup="false">
+
+        <!-- Read-only: a public forecast, nothing about the viewer. -->
+        <provider
+            android:name=".Provider"
+            android:authorities="tv.dumbtv.weather"
+            android:exported="true" />
+    </application>
+</manifest>

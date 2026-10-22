@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -63,6 +64,17 @@ public final class Home extends Activity {
     private View shade;
     private View tint;
     private TextView clock, date;
+    private WeatherPill pill;
+    private TextView credit;
+    private int weatherTicks;
+    /** The clock's format, which the pill's hours follow. */
+    private boolean clock24;
+    private final ContentObserver weatherWatch = new ContentObserver(ui) {
+        @Override
+        public void onChange(boolean self) {
+            loadWeather();
+        }
+    };
     private Row apps, inputs;
     private Tile moving;
     private String wallKey;
@@ -180,6 +192,7 @@ public final class Home extends Activity {
         registerReceiver(packages, f);
         Keeper.start(this);
         if (tv != null) tv.registerCallback(inputWatch, ui);
+        getContentResolver().registerContentObserver(Weather.URI, false, weatherWatch);
         firstApps(catalog);
         loadInputs();
     }
@@ -223,6 +236,7 @@ public final class Home extends Activity {
         f.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         registerReceiver(time, f);
         tick();
+        loadWeather();
     }
 
     @Override
@@ -243,6 +257,7 @@ public final class Home extends Activity {
     @Override
     protected void onDestroy() {
         unregisterReceiver(packages);
+        getContentResolver().unregisterContentObserver(weatherWatch);
         if (tv != null) tv.unregisterCallback(inputWatch);
         io.shutdownNow();
         colorIo.shutdownNow();
@@ -476,6 +491,23 @@ public final class Home extends Activity {
 
         apps = new Row(Catalog.APPS, getString(R.string.row_apps), column);
         inputs = new Row(Catalog.INPUTS, getString(R.string.row_inputs), column);
+
+        // Pinned to the bottom while the rows leave room, below them otherwise.
+        column.addView(new View(this), new LinearLayout.LayoutParams(MATCH, 0, 1f));
+        pill = new WeatherPill(this);
+        pill.setVisibility(View.GONE);
+        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(WRAP, WRAP);
+        pp.gravity = Gravity.CENTER_HORIZONTAL;
+        pp.topMargin = dp(24);
+        column.addView(pill, pp);
+        credit = Ui.text(this, 6.5f, 0x4DFFFFFF, Ui.outfit(this, 400));
+        credit.setText(R.string.wx_credit);
+        credit.setLetterSpacing(0.04f);
+        credit.setVisibility(View.GONE);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(WRAP, WRAP);
+        cp.gravity = Gravity.CENTER_HORIZONTAL;
+        cp.topMargin = dp(8);
+        column.addView(credit, cp);
         return root;
     }
 
@@ -538,7 +570,41 @@ public final class Home extends Activity {
         render(apps);
         render(inputs);
         background();
+        styleClock();
         tick();
+        loadWeather();
+    }
+
+    /** Classic: the system's light face. Large: Outfit ExtraLight at twice the size. */
+    private void styleClock() {
+        boolean large = "large".equals(cfg.get(Config.FACE));
+        clock.setTypeface(large ? Ui.outfit(this, 200) : Ui.LIGHT);
+        clock.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, large ? 110 : 52);
+        clock.setLetterSpacing(large ? -0.03f : 0f);
+        date.setTypeface(large ? Ui.outfit(this, 400) : Ui.MEDIUM);
+        date.setPadding(dp(large ? 6 : 2), dp(8), 0, 0);
+        // Outfit's line box leaves a wide gap under the digits; pull the date up into it.
+        ((LinearLayout.LayoutParams) date.getLayoutParams()).topMargin = large ? -dp(22) : 0;
+        date.requestLayout();
+    }
+
+    /** Asks dumbtv weather for its forecast; the pill hides when there is none to show. */
+    private void loadWeather() {
+        if (!"on".equals(cfg.get(Config.WEATHER))) {
+            pill.setVisibility(View.GONE);
+            credit.setVisibility(View.GONE);
+            return;
+        }
+        io.execute(() -> {
+            Weather w = Weather.load(this);
+            ui.post(() -> {
+                if (isDestroyed()) return;
+                boolean on = w != null && "on".equals(cfg.get(Config.WEATHER));
+                if (on) pill.show(w, clock24);
+                pill.setVisibility(on ? View.VISIBLE : View.GONE);
+                credit.setVisibility(on && "on".equals(cfg.get(Config.CREDIT)) ? View.VISIBLE : View.GONE);
+            });
+        });
     }
 
     /** Rebuilds the app list, keeping loaded art for every package except {@code changed}. */
@@ -701,6 +767,7 @@ public final class Home extends Activity {
     private void tick() {
         String mode = cfg.get(Config.CLOCK);
         boolean h24 = "24h".equals(mode) || "auto".equals(mode) && DateFormat.is24HourFormat(this);
+        clock24 = h24;
         Date now = new Date();
         if (h24) {
             clock.setText(DateFormat.format("HH:mm", now));
@@ -714,6 +781,7 @@ public final class Home extends Activity {
         date.setText(DateFormat.format(DateFormat.getBestDateTimePattern(locale, "EEEEdMMMM"), now));
         // hourly and time-of-day rotations change while the screen stays open; a no-op otherwise
         background();
+        if (++weatherTicks % 10 == 0) loadWeather();
     }
 
     private void background() {

@@ -43,7 +43,8 @@ One wallpaper: name it exactly wallpaper.jpg (or .png) and put it in that folder
 Several wallpapers: put them in %2$s/ with any names, and pick a rotation
 Then pick Background › Image file or Adaptive wallpaper tint. No permission is needed
 Adaptive wallpaper tint shows graphite until you add a wallpaper
-No internet permission. No tracking, no ads, no accounts.</string>
+No internet permission. No tracking, no ads, no accounts.
+Weather data by Open-Meteo.com, CC BY 4.0, fetched by the separate dumbtv weather app.</string>
 
     <!-- Option titles and value names; order matches the values in Config.java -->
     <string name="opt_accent">Accent color</string>
@@ -89,4 +90,35 @@ No internet permission. No tracking, no ads, no accounts.</string>
         <item>Off</item><item>Every return home</item><item>Every hour</item>
         <item>Every day</item><item>By time of day</item>
     </string-array>
+
+    <!-- Clock style and weather -->
+    <string name="opt_clockface">Clock style</string>
+    <string-array name="opt_clockface_names">
+        <item>Classic</item><item>Large</item>
+    </string-array>
+    <string name="opt_weather">Weather</string>
+    <string-array name="opt_weather_names">
+        <item>Shown</item><item>Hidden</item>
+    </string-array>
+    <string name="opt_credit">Weather credit</string>
+    <string-array name="opt_credit_names">
+        <item>Shown</item><item>Hidden</item>
+    </string-array>
+    <string name="wx_temp">%1$d°</string>
+    <string name="wx_max">High %1$d°</string>
+    <string name="wx_min">Low %1$d°</string>
+    <string name="wx_hour_24">%1$d:00</string>
+    <string name="wx_hour_12">%1$d %2$s</string>
+    <string name="wx_credit">Open-Meteo</string>
+    <string name="wx_sunny">Sunny</string>
+    <string name="wx_clear">Clear</string>
+    <string name="wx_mostly_clear">Mostly clear</string>
+    <string name="wx_partly_cloudy">Partly cloudy</string>
+    <string name="wx_overcast">Overcast</string>
+    <string name="wx_fog">Fog</string>
+    <string name="wx_drizzle">Drizzle</string>
+    <string name="wx_rain">Rain</string>
+    <string name="wx_showers">Showers</string>
+    <string name="wx_snow">Snow</string>
+    <string name="wx_storm">Thunderstorm</string>
 </resources>

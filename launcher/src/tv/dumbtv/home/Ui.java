@@ -18,7 +18,24 @@ final class Ui {
     static final Typeface LIGHT = Typeface.create("sans-serif-light", Typeface.NORMAL);
     static final Typeface MEDIUM = Typeface.create("sans-serif-medium", Typeface.NORMAL);
 
+    private static Typeface thin, light, regular;
+
     private Ui() {}
+
+    /** Outfit (SIL OFL, assets/fonts) at 200, 300 or 400; the system face if the file is missing. */
+    static Typeface outfit(Context c, int weight) {
+        if (weight <= 200) return thin != null ? thin : (thin = load(c, "outfit-200.ttf", LIGHT));
+        if (weight <= 300) return light != null ? light : (light = load(c, "outfit-300.ttf", LIGHT));
+        return regular != null ? regular : (regular = load(c, "outfit-400.ttf", MEDIUM));
+    }
+
+    private static Typeface load(Context c, String file, Typeface fallback) {
+        try {
+            return Typeface.createFromAsset(c.getAssets(), "fonts/" + file);
+        } catch (RuntimeException e) {
+            return fallback;
+        }
+    }
 
     static int dp(Context c, float v) {
         return Math.round(v * c.getResources().getDisplayMetrics().density);
