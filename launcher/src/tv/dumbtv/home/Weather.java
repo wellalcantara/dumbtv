@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,30 +24,49 @@ import java.util.Locale;
 final class Weather {
     static final Uri URI = Uri.parse("content://tv.dumbtv.weather/forecast");
     private static final long STALE_MS = 3 * 3_600_000L;
+    private static final int HOURS = 4, DAYS = 3;
 
     enum Sky { SUN, MOON, SUN_CLOUD, MOON_CLOUD, CLOUD, FOG, RAIN, SNOW, STORM }
 
+    /** One upcoming hour; {@code rain} is the precipitation probability in %, -1 if unknown. */
     static final class Hour {
-        final int hour;
+        final int hour, temp, rain;
         final Sky sky;
-        final int temp;
 
-        Hour(int hour, Sky sky, int temp) {
+        Hour(int hour, Sky sky, int temp, int rain) {
             this.hour = hour;
             this.sky = sky;
             this.temp = temp;
+            this.rain = rain;
         }
     }
 
-    final int temp, max, min, code;
+    /** One of the next days, from tomorrow. */
+    static final class Day {
+        final Date date;
+        final Sky sky;
+        final int max, min, rain;
+
+        Day(Date date, Sky sky, int max, int min, int rain) {
+            this.date = date;
+            this.sky = sky;
+            this.max = max;
+            this.min = min;
+            this.rain = rain;
+        }
+    }
+
+    final int temp, max, min, code, rain;
     final boolean day;
     final Sky sky;
     final List<Hour> next = new ArrayList<>();
+    final List<Day> days = new ArrayList<>();
 
-    private Weather(int temp, int max, int min, int code, boolean day) {
+    private Weather(int temp, int max, int min, int rain, int code, boolean day) {
         this.temp = temp;
         this.max = max;
         this.min = min;
+        this.rain = rain;
         this.code = code;
         this.day = day;
         this.sky = sky(code, day);
@@ -60,40 +80,63 @@ final class Weather {
             long fetched = cur.getLong(1);
             if (json == null || System.currentTimeMillis() - fetched > STALE_MS) return null;
             return parse(json, new Date());
-        } catch (RuntimeException | JSONException e) {
+        } catch (RuntimeException | JSONException | ParseException e) {
             Log.w("dumbtv", "weather unavailable", e);
             return null;
         }
     }
 
-    static Weather parse(String json, Date now) throws JSONException {
+    static Weather parse(String json, Date now) throws JSONException, ParseException {
         JSONObject root = new JSONObject(json);
         JSONObject cur = root.getJSONObject("current");
         JSONObject daily = root.getJSONObject("daily");
+        JSONArray dTimes = daily.getJSONArray("time");
+        JSONArray dMax = daily.getJSONArray("temperature_2m_max");
+        JSONArray dMin = daily.getJSONArray("temperature_2m_min");
+        JSONArray dRain = daily.optJSONArray("precipitation_probability_max");
+        JSONArray dCode = daily.optJSONArray("weather_code");
+
+        // timezone=auto: the API's dates and times are the place's local time, which is the TV's.
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(now);
+        int t = 0;
+        while (t < dTimes.length() - 1 && dTimes.getString(t).compareTo(today) < 0) t++;
         Weather w = new Weather(
                 round(cur.getDouble("temperature_2m")),
-                round(daily.getJSONArray("temperature_2m_max").getDouble(0)),
-                round(daily.getJSONArray("temperature_2m_min").getDouble(0)),
+                round(dMax.getDouble(t)),
+                round(dMin.getDouble(t)),
+                percent(dRain, t),
                 cur.getInt("weather_code"),
                 cur.getInt("is_day") == 1);
+
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+        for (int i = t + 1; i < dTimes.length() && w.days.size() < DAYS; i++) {
+            int code = dCode == null ? 3 : dCode.optInt(i, 3);
+            w.days.add(new Day(dayFormat.parse(dTimes.getString(i)), sky(code, true),
+                    round(dMax.getDouble(i)), round(dMin.getDouble(i)), percent(dRain, i)));
+        }
 
         JSONObject hourly = root.getJSONObject("hourly");
         JSONArray times = hourly.getJSONArray("time");
         JSONArray temps = hourly.getJSONArray("temperature_2m");
         JSONArray codes = hourly.getJSONArray("weather_code");
-        JSONArray days = hourly.getJSONArray("is_day");
-        // timezone=auto: the API's times are the place's local time, which is the TV's.
+        JSONArray isDay = hourly.getJSONArray("is_day");
+        JSONArray rain = hourly.optJSONArray("precipitation_probability");
         String key = new SimpleDateFormat("yyyy-MM-dd'T'HH:00", Locale.ROOT).format(now);
         for (int i = 0; i < times.length(); i++) {
             if (!key.equals(times.getString(i))) continue;
-            for (int j = i + 1; j < times.length() && w.next.size() < 3; j++) {
-                String t = times.getString(j);
-                int hour = Integer.parseInt(t.substring(t.indexOf('T') + 1, t.indexOf('T') + 3));
-                w.next.add(new Hour(hour, sky(codes.getInt(j), days.getInt(j) == 1), round(temps.getDouble(j))));
+            for (int j = i + 1; j < times.length() && w.next.size() < HOURS; j++) {
+                String s = times.getString(j);
+                int hour = Integer.parseInt(s.substring(s.indexOf('T') + 1, s.indexOf('T') + 3));
+                w.next.add(new Hour(hour, sky(codes.getInt(j), isDay.getInt(j) == 1),
+                        round(temps.getDouble(j)), percent(rain, j)));
             }
             break;
         }
         return w;
+    }
+
+    private static int percent(JSONArray a, int i) {
+        return a == null || a.isNull(i) ? -1 : a.optInt(i, -1);
     }
 
     private static int round(double v) {

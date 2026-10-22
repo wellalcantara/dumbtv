@@ -504,7 +504,7 @@ public final class Home extends Activity {
         pill.setVisibility(View.GONE);
         LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(WRAP, WRAP);
         pp.gravity = Gravity.CENTER_HORIZONTAL;
-        pp.topMargin = dp(24);
+        pp.topMargin = dp(4);
         column.addView(pill, pp);
         credit = Ui.text(this, 6.5f, 0x4DFFFFFF, Ui.outfit(this, 400));
         credit.setText(R.string.wx_credit);
@@ -512,7 +512,7 @@ public final class Home extends Activity {
         credit.setVisibility(View.GONE);
         LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(WRAP, WRAP);
         cp.gravity = Gravity.CENTER_HORIZONTAL;
-        cp.topMargin = dp(8);
+        cp.topMargin = dp(5);
         column.addView(credit, cp);
         return root;
     }

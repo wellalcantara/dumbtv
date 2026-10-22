@@ -9,96 +9,167 @@ import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
- * The weather pill under the rows: sky icon, temperature, condition with today's high (or low
- * at night), then the next three hours. Its gradient follows the sky. Drawn once per forecast,
- * nothing animates, nothing is focusable.
+ * The weather pill under the rows: sky, temperature, condition, today's high, low and chance of
+ * rain, then the next four hours and the next three days, each with its chance of rain. Its
+ * gradient follows the sky and its width follows its content. Drawn once per forecast, nothing
+ * animates, nothing is focusable.
  */
 final class WeatherPill extends LinearLayout {
     private static final int WRAP = LayoutParams.WRAP_CONTENT;
+    private static final int RAIN = 0xFF9FDCFF, SOFT = 0xD9FFFFFF, DIM = 0xA6FFFFFF;
 
     private final Icon icon;
-    private final TextView temp, line;
-    private final LinearLayout hours;
-    private final View divider;
+    private final TextView temp, condition, high, low, chance;
+    private final LinearLayout rainBox, hours, days;
+    private final View hoursRule, daysRule;
 
     WeatherPill(Context c) {
         super(c);
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
-        setPadding(dp(10), 0, dp(24), 0);
-        setMinimumHeight(dp(78));
+        setPadding(dp(14), dp(8), dp(30), dp(8));
+        setMinimumHeight(dp(94));
         setFocusable(false);
 
         icon = new Icon(c);
-        addView(icon, new LayoutParams(dp(58), dp(58)));
+        addView(icon, new LayoutParams(dp(66), dp(66)));
 
-        LinearLayout text = new LinearLayout(c);
-        text.setOrientation(VERTICAL);
-        temp = Ui.text(c, 42, Ui.TEXT, Ui.outfit(c, 300));
+        LinearLayout now = new LinearLayout(c);
+        now.setOrientation(VERTICAL);
+        LinearLayout top = new LinearLayout(c);
+        top.setOrientation(HORIZONTAL);
+        top.setGravity(Gravity.BOTTOM);
+        temp = Ui.text(c, 52, Ui.TEXT, Ui.outfit(c, 300));
         temp.setLetterSpacing(-0.03f);
-        line = Ui.text(c, 10.5f, 0xE0FFFFFF, Ui.outfit(c, 400));
-        line.setPadding(dp(2), dp(3), 0, 0);
-        text.addView(temp);
-        text.addView(line);
-        LayoutParams tp = new LayoutParams(WRAP, WRAP);
-        tp.leftMargin = dp(12);
-        addView(text, tp);
+        condition = Ui.text(c, 13, Ui.TEXT, Ui.outfit(c, 400));
+        condition.setPadding(dp(9), 0, 0, dp(7));
+        top.addView(temp);
+        top.addView(condition);
+        now.addView(top, new LayoutParams(WRAP, WRAP));
 
-        divider = new View(c);
-        divider.setBackgroundColor(0x38FFFFFF);
-        LayoutParams dp1 = new LayoutParams(Math.max(1, dp(1)), dp(46));
-        dp1.leftMargin = dp(16);
-        dp1.rightMargin = dp(16);
-        addView(divider, dp1);
+        LinearLayout facts = new LinearLayout(c);
+        facts.setOrientation(HORIZONTAL);
+        facts.setGravity(Gravity.CENTER_VERTICAL);
+        facts.setPadding(dp(2), dp(4), 0, 0);
+        high = Ui.text(c, 11, SOFT, Ui.outfit(c, 400));
+        low = Ui.text(c, 11, SOFT, Ui.outfit(c, 400));
+        rainBox = new LinearLayout(c);
+        rainBox.setGravity(Gravity.CENTER_VERTICAL);
+        Icon drop = new Icon(c);
+        drop.set(null);
+        chance = Ui.text(c, 11, RAIN, Ui.outfit(c, 400));
+        rainBox.addView(drop, new LayoutParams(dp(9), dp(11)));
+        LayoutParams cp = new LayoutParams(WRAP, WRAP);
+        cp.leftMargin = dp(3);
+        rainBox.addView(chance, cp);
+        facts.addView(high);
+        facts.addView(low, gap(9));
+        facts.addView(rainBox, gap(9));
+        now.addView(facts, new LayoutParams(WRAP, WRAP));
+        LayoutParams np = new LayoutParams(WRAP, WRAP);
+        np.leftMargin = dp(14);
+        addView(now, np);
 
+        hoursRule = rule(c);
         hours = new LinearLayout(c);
-        hours.setOrientation(HORIZONTAL);
         addView(hours, new LayoutParams(WRAP, WRAP));
+        daysRule = rule(c);
+        days = new LinearLayout(c);
+        addView(days, new LayoutParams(WRAP, WRAP));
+    }
+
+    private View rule(Context c) {
+        View v = new View(c);
+        v.setBackgroundColor(0x38FFFFFF);
+        LayoutParams lp = new LayoutParams(Math.max(1, dp(1)), dp(60));
+        lp.leftMargin = dp(16);
+        lp.rightMargin = dp(16);
+        addView(v, lp);
+        return v;
+    }
+
+    private LayoutParams gap(int left) {
+        LayoutParams lp = new LayoutParams(WRAP, WRAP);
+        lp.leftMargin = dp(left);
+        return lp;
     }
 
     void show(Weather w, boolean h24) {
         Context c = getContext();
-        int[] g = gradient(w.sky);
-        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR, g);
-        bg.setCornerRadius(dp(39));
+        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR, gradient(w.sky));
+        bg.setCornerRadius(dp(47));
         setBackground(bg);
         icon.set(w.sky);
         temp.setText(c.getString(R.string.wx_temp, w.temp));
-        line.setText(w.condition(c) + "  ·  "
-                + c.getString(w.day ? R.string.wx_max : R.string.wx_min, w.day ? w.max : w.min));
+        condition.setText(w.condition(c));
+        high.setText(c.getString(R.string.wx_max, w.max));
+        low.setText(c.getString(R.string.wx_min, w.min));
+        chance.setText(c.getString(R.string.wx_percent, w.rain));
+        rainBox.setVisibility(w.rain >= 0 ? VISIBLE : GONE);
 
         hours.removeAllViews();
         for (Weather.Hour h : w.next) {
-            LinearLayout col = new LinearLayout(c);
-            col.setOrientation(VERTICAL);
-            col.setGravity(Gravity.CENTER_HORIZONTAL);
-            TextView label = Ui.text(c, 9.5f, 0xD9FFFFFF, Ui.outfit(c, 400));
-            label.setText(h24 ? c.getString(R.string.wx_hour_24, h.hour)
+            String label = h24 ? c.getString(R.string.wx_hour_24, h.hour)
                     : c.getString(R.string.wx_hour_12, h.hour % 12 == 0 ? 12 : h.hour % 12,
-                            h.hour < 12 ? "AM" : "PM"));
-            Icon small = new Icon(c);
-            small.set(h.sky);
-            TextView t = Ui.text(c, 12.5f, Ui.TEXT, Ui.outfit(c, 400));
+                            h.hour < 12 ? "AM" : "PM");
+            TextView t = Ui.text(c, 13.5f, Ui.TEXT, Ui.outfit(c, 400));
             t.setText(c.getString(R.string.wx_temp, h.temp));
-            col.addView(label);
-            LayoutParams ip = new LayoutParams(dp(22), dp(22));
-            ip.topMargin = dp(4);
-            ip.bottomMargin = dp(4);
-            col.addView(small, ip);
-            col.addView(t);
-            LayoutParams cp = new LayoutParams(WRAP, WRAP);
-            if (hours.getChildCount() > 0) cp.leftMargin = dp(16);
-            hours.addView(col, cp);
+            column(hours, label, h.sky, t, h.rain);
         }
-        int gone = w.next.isEmpty() ? GONE : VISIBLE;
-        divider.setVisibility(gone);
-        hours.setVisibility(gone);
+        days.removeAllViews();
+        SimpleDateFormat weekday = new SimpleDateFormat("EEE", Locale.getDefault());
+        for (Weather.Day d : w.days) {
+            String name = weekday.format(d.date).replace(".", "");
+            name = name.substring(0, 1).toUpperCase(Locale.getDefault()) + name.substring(1);
+            TextView t = Ui.text(c, 11.5f, Ui.TEXT, Ui.outfit(c, 400));
+            SpannableString range = new SpannableString(c.getString(R.string.wx_temp, d.max) + " "
+                    + c.getString(R.string.wx_temp, d.min));
+            range.setSpan(new ForegroundColorSpan(DIM), range.toString().indexOf(' ') + 1, range.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            t.setText(range);
+            column(days, name, d.sky, t, d.rain);
+        }
+        hoursRule.setVisibility(w.next.isEmpty() ? GONE : VISIBLE);
+        hours.setVisibility(w.next.isEmpty() ? GONE : VISIBLE);
+        daysRule.setVisibility(w.days.isEmpty() ? GONE : VISIBLE);
+        days.setVisibility(w.days.isEmpty() ? GONE : VISIBLE);
+    }
+
+    /** Label, sky, value and chance of rain, stacked and centered. */
+    private void column(LinearLayout row, String label, Weather.Sky sky, TextView value, int rain) {
+        Context c = getContext();
+        LinearLayout col = new LinearLayout(c);
+        col.setOrientation(VERTICAL);
+        col.setGravity(Gravity.CENTER_HORIZONTAL);
+        TextView top = Ui.text(c, 10, SOFT, Ui.outfit(c, 400));
+        top.setText(label);
+        // A vertical LinearLayout gives children MATCH_PARENT width by default, which in a
+        // WRAP_CONTENT column collapses every text to the icon's width.
+        col.addView(top, new LayoutParams(WRAP, WRAP));
+        Icon small = new Icon(c);
+        small.set(sky);
+        LayoutParams ip = new LayoutParams(dp(21), dp(21));
+        ip.topMargin = dp(3);
+        ip.bottomMargin = dp(3);
+        col.addView(small, ip);
+        col.addView(value, new LayoutParams(WRAP, WRAP));
+        TextView r = Ui.text(c, 8.5f, RAIN, Ui.outfit(c, 400));
+        r.setText(rain >= 0 ? c.getString(R.string.wx_percent, rain) : "");
+        r.setPadding(0, dp(2), 0, 0);
+        col.addView(r, new LayoutParams(WRAP, WRAP));
+        row.addView(col, row.getChildCount() > 0 ? gap(17) : new LayoutParams(WRAP, WRAP));
     }
 
     /** Light top-left to dark bottom-right, by sky; day skies warm, night ones deep blue. */
@@ -130,6 +201,7 @@ final class WeatherPill extends LinearLayout {
             setFocusable(false);
         }
 
+        /** {@code null} draws a single rain drop, for the chance of rain. */
         void set(Weather.Sky s) {
             sky = s;
             invalidate();
@@ -138,6 +210,18 @@ final class WeatherPill extends LinearLayout {
         @Override
         protected void onDraw(Canvas canvas) {
             float s = Math.min(getWidth(), getHeight());
+            if (sky == null) {
+                float w = getWidth(), h = getHeight();
+                Path d = new Path();
+                d.moveTo(w / 2, 0);
+                d.cubicTo(w * 0.15f, h * 0.45f, 0, h * 0.6f, 0, h * 0.7f);
+                d.arcTo(new RectF(0, h - w, w, h), 180, -180);
+                d.cubicTo(w, h * 0.6f, w * 0.85f, h * 0.45f, w / 2, 0);
+                paint.setShader(null);
+                paint.setColor(RAIN);
+                canvas.drawPath(d, paint);
+                return;
+            }
             switch (sky) {
                 case SUN: sun(canvas, s * 0.5f, s * 0.5f, s * 0.5f, true); break;
                 case MOON: moon(canvas, s * 0.5f, s * 0.5f, s * 0.5f, true); break;

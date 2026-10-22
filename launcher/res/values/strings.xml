@@ -106,6 +106,7 @@ Weather data by Open-Meteo.com, CC BY 4.0, fetched by the separate dumbtv weathe
         <item>Shown</item><item>Hidden</item>
     </string-array>
     <string name="wx_temp">%1$d°</string>
+    <string name="wx_percent">%1$d%%</string>
     <string name="wx_max">High %1$d°</string>
     <string name="wx_min">Low %1$d°</string>
     <string name="wx_hour_24">%1$d:00</string>

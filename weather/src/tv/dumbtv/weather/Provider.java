@@ -49,7 +49,7 @@ public final class Provider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] args, String sort) {
         Context c = getContext();
-        File cache = new File(c.getFilesDir(), "forecast.json");
+        File cache = new File(c.getFilesDir(), "forecast-v2.json");
         long now = System.currentTimeMillis();
         long fetched = cache.isFile() ? cache.lastModified() : 0;
         if (now - fetched > FRESH_MS && now - lastTry > RETRY_MS) refresh(c, cache);
@@ -94,9 +94,9 @@ public final class Provider extends ContentProvider {
         String query = String.format(Locale.ROOT,
                 "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s"
                         + "&current=temperature_2m,weather_code,is_day"
-                        + "&hourly=temperature_2m,weather_code,is_day"
-                        + "&daily=temperature_2m_max,temperature_2m_min"
-                        + "&timezone=auto&forecast_days=2%s",
+                        + "&hourly=temperature_2m,weather_code,is_day,precipitation_probability"
+                        + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+                        + "&timezone=auto&forecast_days=4%s",
                 lat, lon, unit == null ? "" : "&temperature_unit=" + unit);
         HttpURLConnection http = (HttpURLConnection) new URL(query).openConnection();
         http.setConnectTimeout(10_000);
