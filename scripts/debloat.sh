@@ -131,6 +131,9 @@ done
 step "privacy settings"
 while read -r ns key value; do
   [[ -z ${ns:-} || $ns == \#* ]] && continue
+  if [[ $ALEXA == 1 && $key == voice_disabled ]]; then
+    printf '  %-46s left alone (ALEXA=1)\n' "$key"; continue
+  fi
   acmd settings put "$ns" "$key" "$value" >/dev/null
   printf '  %-46s %s\n' "$key" "$value"
 done < <(list_of "$(fos settings.txt)" | sed 's/ = / /')

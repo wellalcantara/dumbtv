@@ -21,7 +21,9 @@ SDK=${SDK:-0}
 REINSTALL=${REINSTALL:-0}
 
 # Preferences written by scripts/configure.sh. Absent file = defaults: keep
-# nothing extra, PRIME=1, LAUNCHER=1, DNSFILTER=1, SYSTEM_DNS=0.
+# nothing extra, PRIME=1, LAUNCHER=1, DNSFILTER=1, SYSTEM_DNS=0, ALEXA=0.
+# ALEXA=1 keeps voice on the remote: no voice_disabled, Alexa voice hosts left out of
+# the filter. The Alexa packages themselves go in KEEP_APPS.
 load_conf() {
   KEEP_APPS=${KEEP_APPS:-}
   REMOVE_EXTRA=${REMOVE_EXTRA:-}
@@ -30,11 +32,13 @@ load_conf() {
   DNSFILTER=${DNSFILTER:-1}
   SYSTEM_DNS=${SYSTEM_DNS:-0}
   FILTER_AUTOSTART=${FILTER_AUTOSTART:-1}
+  ALEXA=${ALEXA:-0}
   [[ -f $CONF ]] && source "$CONF"
   KEEP_APPS=${KEEP_APPS:-}; REMOVE_EXTRA=${REMOVE_EXTRA:-}
   PRIME=${PRIME:-1}; LAUNCHER=${LAUNCHER:-1}; DNSFILTER=${DNSFILTER:-1}
   SYSTEM_DNS=${SYSTEM_DNS:-0}
   FILTER_AUTOSTART=${FILTER_AUTOSTART:-1}
+  ALEXA=${ALEXA:-0}
 }
 
 keep_pkg() {

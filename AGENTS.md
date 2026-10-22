@@ -95,6 +95,14 @@ That writes `dumbtv.conf` (git-ignored). `debloat.sh`, `dnsfilter.sh`,
 uninstalled or disabled, `PRIME=1` keeps Prime's CDN out of the blocklist, and
 `LAUNCHER=0`, `DNSFILTER=0`, `YOUTUBE=0` skip those steps entirely.
 
+**Keeping Alexa on the remote.** If the user wants the voice button to keep
+working, set `ALEXA=1` in `dumbtv.conf` and put the Alexa packages in `KEEP_APPS`
+(the `# --- Alexa` block of `data/<platform>/packages.txt`; multi-room audio can
+still go). `debloat.sh` then leaves `voice_disabled` alone, `dnsfilter.sh` leaves
+the "Alexa voice and device API" block of `extra-hosts.txt` out of the list, and
+the self-test and `verify.sh` skip `*.amazonalexa.com`. Alexa's analytics hosts
+stay blocked. `configure.sh` keeps an `ALEXA=1` it finds when it is re-run.
+
 Re-run `configure.sh` if the user changes their mind. Do not hand-edit the
 scripts for preferences.
 

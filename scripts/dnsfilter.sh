@@ -42,6 +42,7 @@ if [[ $PRIME == 1 ]]; then
 else
   note "prime video    blocked (aiv-delivery / aiv-cdn); YouTube is unaffected"
 fi
+[[ $ALEXA == 1 ]] && note "alexa          kept: voice hosts stay out of the list, its telemetry does not"
 if [[ $DRY_RUN == 0 ]]; then confirm "Install the on-device DNS filter on $SERIAL?" || die "cancelled"; fi
 
 step "blocklist"
@@ -55,7 +56,13 @@ else
     grep -viE 'aiv-delivery|aiv-cdn' "$LIST" > "$LIST.noprime" || true
     mv "$LIST.noprime" "$LIST"
   fi
-  grep -v '^#' "$DATA/blocklists/extra-hosts.txt" | awk 'NF' >> "$LIST"
+  if [[ $ALEXA == 1 ]]; then
+    # ALEXA=1: the voice block (from its header to the next blank line) stays resolvable.
+    awk '/^# Alexa voice and device API/{skip=1} skip&&!NF{skip=0} !skip' "$DATA/blocklists/extra-hosts.txt" |
+      grep -v '^#' | awk 'NF' >> "$LIST"
+  else
+    grep -v '^#' "$DATA/blocklists/extra-hosts.txt" | awk 'NF' >> "$LIST"
+  fi
   note "$(grep -c . "$LIST") entries"
 fi
 
@@ -227,6 +234,9 @@ case $line in
   *) printf '  %-34s NOT BLOCKED after 30s: %s\n' softwareupdates.amazon.com "$line"; fail=1 ;;
 esac
 while read -r h; do
+  if [[ $ALEXA == 1 && $h == *amazonalexa.com ]]; then
+    printf '  %-34s kept for Alexa (ALEXA=1)\n' "$h"; continue
+  fi
   line=$(dev "ping -c1 -W2 $h" | head -1)
   case $line in
     *0.0.0.0*|*127.0.0.1*) printf '  %-34s blocked\n' "$h" ;;

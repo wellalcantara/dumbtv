@@ -18,6 +18,9 @@ if [[ $DNSFILTER == 0 ]]; then
   printf '%-10s %-38s %s\n' skip dns "DNSFILTER=0, not checked"
 else
   while read -r h; do
+    if [[ $ALEXA == 1 && $h == *amazonalexa.com ]]; then
+      printf '%-10s %-38s kept for Alexa (ALEXA=1)\n' skip "$h"; continue
+    fi
     line=$(dev "ping -c1 -W2 $h" | head -1)
     case $line in
       *0.0.0.0*|*127.0.0.1*) printf '%-10s %-38s blocked\n' ok "$h" ;;

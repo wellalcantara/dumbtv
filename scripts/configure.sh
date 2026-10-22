@@ -102,6 +102,9 @@ fi
 # Not asked: an advanced switch for one filter problem (docs/GOTCHAS.md). Keep a set value.
 FILTER_AUTOSTART=$([[ -f $CONF ]] && sed -n 's/^FILTER_AUTOSTART=//p' "$CONF" | tail -1)
 FILTER_AUTOSTART=${FILTER_AUTOSTART:-1}
+# Not asked either: ALEXA=1 keeps voice on the remote (AGENTS.md). Keep a set value.
+ALEXA=$([[ -f $CONF ]] && sed -n 's/^ALEXA=//p' "$CONF" | tail -1)
+ALEXA=${ALEXA:-0}
 
 mkdir -p "$REPORT"
 cat > "$CONF" <<EOF_CONF
@@ -114,6 +117,7 @@ DNSFILTER=$DNSFILTER
 SYSTEM_DNS=$SYSTEM_DNS
 YOUTUBE=$YOUTUBE
 FILTER_AUTOSTART=$FILTER_AUTOSTART
+ALEXA=$ALEXA
 EOF_CONF
 
 # Prove the file before anyone sources it.
