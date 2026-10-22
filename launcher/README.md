@@ -41,7 +41,7 @@ Undo: `./launcher/install.sh --undo` gives HOME back to Amazon's launcher.
 | OK | open the app, or switch to the input |
 | Hold OK, or ☰ Menu | Move, Rename, Hide, App info |
 | Move mode | ◀ ▶ moves the tile, ▲ ▼ moves it a line in the grid, any other key drops it |
-| Up from the top row | Options and Settings |
+| Up from the top row | Options, and the TV's own settings (named Fire TV on Fire OS) |
 | Back on the home screen | jump to the first tile |
 | On an input: Back | back to the home screen |
 | On an input: ☰ Menu | show the input's name again |
@@ -60,10 +60,12 @@ next to those two.
 | Layout | rows, or a grid that wraps to as many columns as fit |
 | App names | on focus, always, never |
 | Clock | system, 24-hour, 12-hour |
+| Clock style | classic (system face), large (Outfit, about twice the size) |
 | Inputs row | shown, hidden |
 | Open inputs with | Automatic, the TV's app, dumbtv home (see below) |
 | Background | black, graphite, midnight, image, adaptive, adaptive tint |
 | Image dim, wallpaper rotation | for image backgrounds |
+| Weather, weather credit | shown or hidden; only with [dumbtv weather](#weather) installed |
 
 Below them: Next wallpaper, which apps and inputs appear on the home screen, a
 reset for order, names and hidden tiles, and **Open Amazon's home screen**. Apps
@@ -106,6 +108,8 @@ layout=rows
 labels=focus
 # auto 24h 12h
 clock=auto
+# classic large
+clockface=classic
 # on off
 inputs=on
 # auto tv home
@@ -116,6 +120,9 @@ background=black
 dim=40
 # off visit hourly daily daytime (visit = every return to the home screen)
 rotate=off
+# on off: the weather pill, and the Open-Meteo line under it
+weather=on
+credit=on
 apps.order=com.amazon.firetv.youtube,org.videolan.vlc
 apps.hide=org.videolan.vlc
 apps.show=com.amazon.venezia
@@ -147,6 +154,38 @@ in `morning-coast.jpg`.
 `background=adaptive` takes a dark colour from the focused app's artwork.
 `background=adaptive-tint` keeps the wallpaper and adds a light wash of that
 colour; without a wallpaper it shows graphite.
+
+## Weather
+
+A pill under the rows: the sky, the temperature, today's high, low and chance of
+rain, then the next four hours and the next three days. Its colour follows the sky
+and the time of day; its hours follow the clock setting.
+
+The launcher still has no internet permission. The forecast comes from a separate
+13 KB app in [`weather/`](../weather), **dumbtv weather**, which has only that
+permission, no screen and no background service. The launcher asks it for the
+forecast while the home screen is open; when its copy is over 30 minutes old it
+fetches a new one from [Open-Meteo](https://open-meteo.com/) (no key, no account).
+With the TV playing something, nothing runs. Without the app, or with a forecast
+over three hours old, the pill is not shown.
+
+```sh
+./scripts/weather.sh --lat -23.55 --lon -46.63     # builds, installs, sets the place
+./scripts/weather.sh --remove
+```
+
+The coordinates go to the TV (`/sdcard/Android/data/tv.dumbtv.weather/files/weather.conf`)
+and to Open-Meteo, nowhere else. `--fahrenheit` switches the unit. The script also
+puts the app on the data-saver allow list, which `lockdown.sh` would otherwise use
+to cut its connection.
+
+Weather data by [Open-Meteo.com](https://open-meteo.com/), licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the pill carries a small
+credit line (Options › Weather credit) and the Options footer the full one.
+
+The large clock and the pill use [Outfit](https://github.com/Outfitio/Outfit-Fonts)
+(SIL Open Font License 1.1, `assets/fonts/OFL.txt`), bundled as three static weights
+subset to Latin, about 86 KB.
 
 ## How HOME works on Fire OS
 
@@ -233,7 +272,11 @@ Delete both to stop.
 | `src/.../Input.java` | the built-in input screen (`TvView`) |
 | `src/.../Config.java` | reads and writes `home.conf` |
 | `src/.../Options.java` | the settings screen |
-| `src/.../Ui.java` | shared colours, text and sizes |
+| `src/.../Ui.java` | shared colours, text and sizes, and the bundled Outfit faces |
+| `src/.../Weather.java` | reads and parses the forecast from dumbtv weather |
+| `src/.../WeatherPill.java` | the weather pill and its sky icons, drawn in code |
+| `assets/fonts/` | Outfit at 200, 300 and 400, with its licence |
+| `../weather/` | dumbtv weather: the provider that fetches the forecast, and its `build.sh` |
 | `src/.../Guard.java` | the Fire OS 7 and 8 HOME takeover |
 | `src/.../Keeper.java` | the Fire OS 6 HOME takeover |
 | `src/.../BootReceiver.java` | restarts the Keeper after a boot or an update |
