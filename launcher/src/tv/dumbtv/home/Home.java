@@ -477,6 +477,9 @@ public final class Home extends Activity {
         LinearLayout head = new LinearLayout(this);
         head.setGravity(Gravity.TOP);
         head.setPadding(dp(56), 0, dp(56), dp(12));
+        // A focused chip grows 6%; clipped to the padding, the right one lost its edge.
+        head.setClipToPadding(false);
+        head.setClipChildren(false);
         LinearLayout when = new LinearLayout(this);
         when.setOrientation(LinearLayout.VERTICAL);
         clock = Ui.text(this, 52, Ui.TEXT, Ui.LIGHT);
@@ -486,7 +489,10 @@ public final class Home extends Activity {
         when.addView(date);
         head.addView(when, new LinearLayout.LayoutParams(0, WRAP, 1f));
         head.addView(chip(getString(R.string.options), v -> startActivity(new Intent(this, Options.class))));
-        head.addView(chip(getString(R.string.settings), v -> openSettings()));
+        // Two chips both called something like "settings" read as the same thing twice: on Fire OS
+        // the system one is named for the device.
+        boolean fire = "Amazon".equalsIgnoreCase(android.os.Build.MANUFACTURER);
+        head.addView(chip(getString(fire ? R.string.settings_fire : R.string.settings), v -> openSettings()));
         column.addView(head, new LinearLayout.LayoutParams(MATCH, WRAP));
 
         apps = new Row(Catalog.APPS, getString(R.string.row_apps), column);

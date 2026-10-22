@@ -5,6 +5,7 @@
 
     <string name="options">Opções</string>
     <string name="settings">Configurações</string>
+    <string name="settings_fire">Fire TV</string>
     <string name="row_apps">Apps</string>
     <string name="row_inputs">Entradas</string>
     <string name="open_failed">Não foi possível abrir</string>
