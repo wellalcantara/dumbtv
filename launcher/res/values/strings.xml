@@ -3,4 +3,90 @@
     <string name="app_name">dumbtv</string>
     <string name="guard_label">dumbtv home button</string>
     <string name="guard_description">Sends the HOME button to the dumbtv home screen instead of Amazon\'s. It reads no screen content and has no internet access.</string>
+
+    <!-- Home screen -->
+    <string name="options">Options</string>
+    <string name="settings">Settings</string>
+    <string name="row_apps">Apps</string>
+    <string name="row_inputs">Inputs</string>
+    <string name="open_failed">Could not open that</string>
+    <string name="tile_move">Move</string>
+    <string name="tile_rename">Rename</string>
+    <string name="tile_hide">Hide</string>
+    <string name="tile_app_info">App info</string>
+    <string name="tile_hidden">Hidden. Bring it back from Options.</string>
+    <string name="rename_title">Rename</string>
+    <string name="save">Save</string>
+    <string name="original">Original</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Inputs -->
+    <string name="input_failed">Could not open input</string>
+    <string name="input_no_signal">No signal</string>
+
+    <!-- Fire OS 6 keeper notification -->
+    <string name="keeper_text">home keeper</string>
+
+    <!-- Options screen -->
+    <string name="next_wallpaper">Next wallpaper</string>
+    <string name="apps_on_home">Apps on home screen</string>
+    <string name="inputs_on_home">Inputs on home screen</string>
+    <string name="reset_layout">Reset order, names and hidden tiles</string>
+    <string name="open_amazon_home">Open Amazon\'s home screen</string>
+    <string name="done">Done</string>
+    <string name="reset_title">Reset the home screen layout?</string>
+    <string name="reset_message">Order, names and hidden tiles go back to default. Colors and sizes stay.</string>
+    <string name="reset">Reset</string>
+    <!-- %1$s settings file path, %2$s wallpaper folder name -->
+    <string name="about">Settings file: %1$s
+One wallpaper: name it exactly wallpaper.jpg (or .png) and put it in that folder
+Several wallpapers: put them in %2$s/ with any names, and pick a rotation
+Then pick Background › Image file or Adaptive wallpaper tint. No permission is needed
+Adaptive wallpaper tint shows graphite until you add a wallpaper
+No internet permission. No tracking, no ads, no accounts.</string>
+
+    <!-- Option titles and value names; order matches the values in Config.java -->
+    <string name="opt_accent">Accent color</string>
+    <string-array name="opt_accent_names">
+        <item>White</item><item>Blue</item><item>Cyan</item><item>Green</item>
+        <item>Amber</item><item>Red</item><item>Pink</item><item>Violet</item>
+    </string-array>
+    <string name="opt_tiles">Tile size</string>
+    <string-array name="opt_tiles_names">
+        <item>Small</item><item>Medium</item><item>Large</item>
+    </string-array>
+    <string name="opt_layout">Layout</string>
+    <string-array name="opt_layout_names">
+        <item>Rows</item><item>Grid</item>
+    </string-array>
+    <string name="opt_labels">App names</string>
+    <string-array name="opt_labels_names">
+        <item>On focus</item><item>Always</item><item>Never</item>
+    </string-array>
+    <string name="opt_clock">Clock</string>
+    <string-array name="opt_clock_names">
+        <item>System</item><item>24-hour</item><item>12-hour</item>
+    </string-array>
+    <string name="opt_inputs">Inputs row</string>
+    <string-array name="opt_inputs_names">
+        <item>Shown</item><item>Hidden</item>
+    </string-array>
+    <string name="opt_switch">Open inputs with</string>
+    <string-array name="opt_switch_names">
+        <item>Automatic</item><item>The TV\'s app</item><item>dumbtv home</item>
+    </string-array>
+    <string name="opt_background">Background</string>
+    <string-array name="opt_background_names">
+        <item>Black</item><item>Graphite</item><item>Midnight</item>
+        <item>Image file</item><item>Adaptive solid</item><item>Adaptive wallpaper tint</item>
+    </string-array>
+    <string name="opt_dim">Image dim</string>
+    <string-array name="opt_dim_names">
+        <item>0%</item><item>20%</item><item>40%</item><item>60%</item><item>80%</item>
+    </string-array>
+    <string name="opt_rotate">Wallpaper rotation</string>
+    <string-array name="opt_rotate_names">
+        <item>Off</item><item>Every return home</item><item>Every hour</item>
+        <item>Every day</item><item>By time of day</item>
+    </string-array>
 </resources>

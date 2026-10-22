@@ -47,6 +47,10 @@ Undo: `./launcher/install.sh --undo` gives HOME back to Amazon's launcher.
 | On an input: ☰ Menu | show the input's name again |
 | Hold HOME | Fire OS quick menu (Amazon's, unchanged) |
 
+The launcher follows the TV's language: English, and Brazilian Portuguese
+(`res/values-pt-rBR`). Another language is one more `res/values-<lang>/strings.xml`
+next to those two.
+
 **Options** cycles each setting with ◀ ▶ or OK:
 
 | Setting | Choices |

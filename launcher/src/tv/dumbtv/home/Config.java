@@ -50,6 +50,24 @@ final class Config {
             int i = Arrays.asList(values).indexOf(value);
             return i < 0 ? value : names[i];
         }
+
+        /**
+         * The title in the TV's language: string resource {@code opt_<key>}, the English title
+         * when there is none. Looked up by name so this class compiles without the generated R.
+         */
+        String title(Context c) {
+            int id = c.getResources().getIdentifier("opt_" + key, "string", c.getPackageName());
+            return id == 0 ? title : c.getString(id);
+        }
+
+        /** A value's name in the TV's language: array {@code opt_<key>_names}, else English. */
+        String name(Context c, String value) {
+            int i = Arrays.asList(values).indexOf(value);
+            int id = c.getResources().getIdentifier("opt_" + key + "_names", "array", c.getPackageName());
+            if (i < 0 || id == 0) return name(value);
+            String[] shown = c.getResources().getStringArray(id);
+            return i < shown.length ? shown[i] : names[i];
+        }
     }
 
     static final Choice ACCENT = new Choice("accent", "Accent color", "blue",

@@ -43,20 +43,20 @@ public final class Options extends Activity {
         scroll.addView(list);
 
         TextView title = Ui.text(this, 30, Ui.TEXT, Ui.LIGHT);
-        title.setText("Options");
+        title.setText(R.string.options);
         title.setPadding(dp(16), 0, 0, dp(20));
         list.addView(title);
 
         for (Config.Choice c : Config.CHOICES) list.addView(choice(c));
-        list.addView(action("Next wallpaper", () -> {
+        list.addView(action(getString(R.string.next_wallpaper), () -> {
             cfg.nextWallpaper();
             refresh();
         }));
         list.addView(gap());
-        list.addView(action("Apps on home screen", () -> pick(Catalog.APPS)));
-        list.addView(action("Inputs on home screen", () -> pick(Catalog.INPUTS)));
-        list.addView(action("Reset order, names and hidden tiles", this::reset));
-        list.addView(action("Open Amazon's home screen", () -> {
+        list.addView(action(getString(R.string.apps_on_home), () -> pick(Catalog.APPS)));
+        list.addView(action(getString(R.string.inputs_on_home), () -> pick(Catalog.INPUTS)));
+        list.addView(action(getString(R.string.reset_layout), this::reset));
+        list.addView(action(getString(R.string.open_amazon_home), () -> {
             Guard.amazon(this);
             finish();
         }));
@@ -64,12 +64,7 @@ public final class Options extends Activity {
         TextView about = Ui.text(this, 13, Ui.FAINT, Ui.MEDIUM);
         about.setLineSpacing(0, 1.4f);
         about.setPadding(dp(16), dp(28), 0, 0);
-        about.setText("Settings file: " + cfg.dir + "/" + Config.FILE
-                + "\nOne wallpaper: name it exactly wallpaper.jpg (or .png) and put it in that folder"
-                + "\nSeveral wallpapers: put them in " + Config.WALLPAPERS + "/ with any names, and pick a rotation"
-                + "\nThen pick Background › Image file or Adaptive wallpaper tint. No permission is needed"
-                + "\nAdaptive wallpaper tint shows graphite until you add a wallpaper"
-                + "\nNo internet permission. No tracking, no ads, no accounts.");
+        about.setText(getString(R.string.about, cfg.dir + "/" + Config.FILE, Config.WALLPAPERS));
         list.addView(about);
 
         setContentView(scroll);
@@ -89,7 +84,7 @@ public final class Options extends Activity {
 
     private View choice(Config.Choice c) {
         LinearLayout row = row();
-        TextView name = label(c.title);
+        TextView name = label(c.title(this));
         TextView value = Ui.text(this, 16, Ui.MUTED, Ui.MEDIUM);
         value.setGravity(Gravity.END);
         row.addView(name, new LinearLayout.LayoutParams(0, WRAP, 1f));
@@ -103,7 +98,7 @@ public final class Options extends Activity {
         });
         Runnable show = () -> {
             boolean focused = row.isFocused();
-            String text = c.name(cfg.get(c));
+            String text = c.name(this, cfg.get(c));
             if (c == Config.ACCENT) {
                 SpannableString s = new SpannableString("●  " + text);
                 s.setSpan(new ForegroundColorSpan(cfg.accent()), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -188,19 +183,19 @@ public final class Options extends Activity {
             on[i] = Catalog.shown(cfg, kind, items.get(i));
         }
         new AlertDialog.Builder(this, Ui.DIALOG)
-                .setTitle(Catalog.APPS.equals(kind) ? "Apps on home screen" : "Inputs on home screen")
+                .setTitle(Catalog.APPS.equals(kind) ? R.string.apps_on_home : R.string.inputs_on_home)
                 .setMultiChoiceItems(names, on, (d, which, checked) ->
                         Catalog.setShown(cfg, kind, items.get(which), checked))
-                .setPositiveButton("Done", null)
+                .setPositiveButton(R.string.done, null)
                 .show();
     }
 
     private void reset() {
         new AlertDialog.Builder(this, Ui.DIALOG)
-                .setTitle("Reset the home screen layout?")
-                .setMessage("Order, names and hidden tiles go back to default. Colors and sizes stay.")
-                .setPositiveButton("Reset", (d, w) -> cfg.removePrefix("name.", "apps.", "inputs."))
-                .setNegativeButton("Cancel", null)
+                .setTitle(R.string.reset_title)
+                .setMessage(R.string.reset_message)
+                .setPositiveButton(R.string.reset, (d, w) -> cfg.removePrefix("name.", "apps.", "inputs."))
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 

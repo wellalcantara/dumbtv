@@ -38,7 +38,6 @@ public final class Input extends Activity {
     private static final int WRAP = ViewGroup.LayoutParams.WRAP_CONTENT;
     private static final String EXTRA_ID = "input", EXTRA_NAME = "name";
     private static final long NAME_MS = 2500, SIGNAL_MS = 6000;
-    private static final String FAILED = "Could not open input", NO_SIGNAL = "No signal";
     private static final String AMAZON_LIVE_TV = "com.amazon.tv.livetv";
 
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -48,17 +47,17 @@ public final class Input extends Activity {
     private String id;
     private final Runnable hideName = () -> name.animate().alpha(0f).setDuration(250)
             .withEndAction(() -> name.setVisibility(View.GONE)).start();
-    private final Runnable noSignal = () -> status(NO_SIGNAL);
+    private final Runnable noSignal = () -> status(getString(R.string.input_no_signal));
 
     private final TvView.TvInputCallback watch = new TvView.TvInputCallback() {
         @Override
         public void onConnectionFailed(String inputId) {
-            status(FAILED);
+            status(getString(R.string.input_failed));
         }
 
         @Override
         public void onDisconnected(String inputId) {
-            status(FAILED);
+            status(getString(R.string.input_failed));
         }
 
         @Override
@@ -71,7 +70,7 @@ public final class Input extends Activity {
             // Tuning and buffering are on the way to a picture; everything else means none is coming.
             boolean pending = reason == TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING
                     || reason == TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING;
-            if (!pending) status(NO_SIGNAL);
+            if (!pending) status(getString(R.string.input_no_signal));
         }
     };
 
@@ -133,7 +132,7 @@ public final class Input extends Activity {
         super.onStart();
         showName();
         if (view == null || id == null) {
-            status(FAILED);
+            status(getString(R.string.input_failed));
             return;
         }
         ((AudioManager) getSystemService(Context.AUDIO_SERVICE))

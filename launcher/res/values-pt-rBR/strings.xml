@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="guard_label">Botão Início do dumbtv</string>
+    <string name="guard_description">Leva o botão Início para a tela inicial do dumbtv em vez da tela da Amazon. Não lê nada da tela e não tem acesso à internet.</string>
+
+    <string name="options">Opções</string>
+    <string name="settings">Configurações</string>
+    <string name="row_apps">Apps</string>
+    <string name="row_inputs">Entradas</string>
+    <string name="open_failed">Não foi possível abrir</string>
+    <string name="tile_move">Mover</string>
+    <string name="tile_rename">Renomear</string>
+    <string name="tile_hide">Ocultar</string>
+    <string name="tile_app_info">Informações do app</string>
+    <string name="tile_hidden">Oculto. Para mostrar de novo, vá em Opções.</string>
+    <string name="rename_title">Renomear</string>
+    <string name="save">Salvar</string>
+    <string name="original">Original</string>
+    <string name="cancel">Cancelar</string>
+
+    <string name="input_failed">Não foi possível abrir a entrada</string>
+    <string name="input_no_signal">Sem sinal</string>
+
+    <string name="keeper_text">mantém a tela inicial</string>
+
+    <string name="next_wallpaper">Próximo papel de parede</string>
+    <string name="apps_on_home">Apps na tela inicial</string>
+    <string name="inputs_on_home">Entradas na tela inicial</string>
+    <string name="reset_layout">Restaurar ordem, nomes e itens ocultos</string>
+    <string name="open_amazon_home">Abrir a tela inicial da Amazon</string>
+    <string name="done">Concluído</string>
+    <string name="reset_title">Restaurar o layout da tela inicial?</string>
+    <string name="reset_message">A ordem, os nomes e os itens ocultos voltam ao padrão. Cores e tamanhos continuam como estão.</string>
+    <string name="reset">Restaurar</string>
+    <string name="about">Arquivo de configuração: %1$s
+Um papel de parede: chame o arquivo de wallpaper.jpg (ou .png) e coloque nessa pasta
+Vários papéis de parede: coloque em %2$s/ com qualquer nome e escolha um rodízio
+Depois escolha Fundo › Imagem ou Tom adaptativo sobre a imagem. Nenhuma permissão é necessária
+Tom adaptativo sobre a imagem mostra grafite até você adicionar uma imagem
+Sem permissão de internet. Sem rastreamento, sem anúncios, sem contas.</string>
+
+    <string name="opt_accent">Cor de destaque</string>
+    <string-array name="opt_accent_names">
+        <item>Branco</item><item>Azul</item><item>Ciano</item><item>Verde</item>
+        <item>Âmbar</item><item>Vermelho</item><item>Rosa</item><item>Violeta</item>
+    </string-array>
+    <string name="opt_tiles">Tamanho dos ícones</string>
+    <string-array name="opt_tiles_names">
+        <item>Pequeno</item><item>Médio</item><item>Grande</item>
+    </string-array>
+    <string name="opt_layout">Disposição</string>
+    <string-array name="opt_layout_names">
+        <item>Fileiras</item><item>Grade</item>
+    </string-array>
+    <string name="opt_labels">Nomes dos apps</string>
+    <string-array name="opt_labels_names">
+        <item>Ao selecionar</item><item>Sempre</item><item>Nunca</item>
+    </string-array>
+    <string name="opt_clock">Relógio</string>
+    <string-array name="opt_clock_names">
+        <item>Do sistema</item><item>24 horas</item><item>12 horas</item>
+    </string-array>
+    <string name="opt_inputs">Fileira de entradas</string>
+    <string-array name="opt_inputs_names">
+        <item>Visível</item><item>Oculta</item>
+    </string-array>
+    <string name="opt_switch">Abrir entradas com</string>
+    <string-array name="opt_switch_names">
+        <item>Automático</item><item>App da TV</item><item>dumbtv home</item>
+    </string-array>
+    <string name="opt_background">Fundo</string>
+    <string-array name="opt_background_names">
+        <item>Preto</item><item>Grafite</item><item>Azul-noite</item>
+        <item>Imagem</item><item>Cor adaptativa</item><item>Tom adaptativo sobre a imagem</item>
+    </string-array>
+    <string name="opt_dim">Escurecer imagem</string>
+    <string-array name="opt_dim_names">
+        <item>0%</item><item>20%</item><item>40%</item><item>60%</item><item>80%</item>
+    </string-array>
+    <string name="opt_rotate">Rodízio de papéis de parede</string>
+    <string-array name="opt_rotate_names">
+        <item>Desligado</item><item>A cada volta ao início</item><item>A cada hora</item>
+        <item>A cada dia</item><item>Pelo período do dia</item>
+    </string-array>
+</resources>
