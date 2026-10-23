@@ -64,6 +64,8 @@ public final class Home extends Activity {
     private View shade;
     private View tint;
     private TextView clock, date, note;
+    /** The chips and the note, top-aligned with the clock's digits. */
+    private LinearLayout side;
     private WeatherPill pill;
     private TextView credit;
     private int weatherTicks;
@@ -489,7 +491,7 @@ public final class Home extends Activity {
         when.addView(date);
         head.addView(when, new LinearLayout.LayoutParams(0, WRAP, 1f));
         // The chips, and under them, right-aligned, the owner's note (note= in home.conf).
-        LinearLayout side = new LinearLayout(this);
+        side = new LinearLayout(this);
         side.setOrientation(LinearLayout.VERTICAL);
         side.setGravity(Gravity.END);
         side.setClipChildren(false);
@@ -613,6 +615,13 @@ public final class Home extends Activity {
         // Outfit's line box leaves a wide gap under the digits; pull the date up into it.
         ((LinearLayout.LayoutParams) date.getLayoutParams()).topMargin = large ? -dp(22) : 0;
         date.requestLayout();
+        // Line the chips' top up with the top of the digits, not the top of the clock's line box:
+        // Outfit leaves a tall gap above its figures. Measured, so both styles line up.
+        android.graphics.Rect digits = new android.graphics.Rect();
+        clock.getPaint().getTextBounds("0123456789", 0, 10, digits);
+        int digitTop = Math.round(-clock.getPaint().getFontMetrics().ascent) + digits.top;
+        ((LinearLayout.LayoutParams) side.getLayoutParams()).topMargin = Math.max(0, digitTop - dp(6));
+        side.requestLayout();
     }
 
     /** Asks dumbtv weather for its forecast; the pill hides when there is none to show. */
