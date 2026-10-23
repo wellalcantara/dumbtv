@@ -63,7 +63,7 @@ public final class Home extends Activity {
     private ImageView wall;
     private View shade;
     private View tint;
-    private TextView clock, date;
+    private TextView clock, date, note;
     private WeatherPill pill;
     private TextView credit;
     private int weatherTicks;
@@ -488,11 +488,29 @@ public final class Home extends Activity {
         when.addView(clock);
         when.addView(date);
         head.addView(when, new LinearLayout.LayoutParams(0, WRAP, 1f));
-        head.addView(chip(getString(R.string.options), v -> startActivity(new Intent(this, Options.class))));
+        // The chips, and under them, right-aligned, the owner's note (note= in home.conf).
+        LinearLayout side = new LinearLayout(this);
+        side.setOrientation(LinearLayout.VERTICAL);
+        side.setGravity(Gravity.END);
+        side.setClipChildren(false);
+        side.setClipToPadding(false);
+        LinearLayout chipRow = new LinearLayout(this);
+        chipRow.setClipChildren(false);
+        chipRow.setClipToPadding(false);
+        chipRow.addView(chip(getString(R.string.options), v -> startActivity(new Intent(this, Options.class))));
         // Two chips both called something like "settings" read as the same thing twice: on Fire OS
         // the system one is named for the device.
         boolean fire = "Amazon".equalsIgnoreCase(android.os.Build.MANUFACTURER);
-        head.addView(chip(getString(fire ? R.string.settings_fire : R.string.settings), v -> openSettings()));
+        chipRow.addView(chip(getString(fire ? R.string.settings_fire : R.string.settings), v -> openSettings()));
+        side.addView(chipRow, new LinearLayout.LayoutParams(WRAP, WRAP));
+        note = Ui.text(this, 13, Ui.MUTED, Ui.outfit(this, 400));
+        note.setGravity(Gravity.END);
+        note.setVisibility(View.GONE);
+        LinearLayout.LayoutParams nl = new LinearLayout.LayoutParams(WRAP, WRAP);
+        nl.topMargin = dp(12);
+        nl.rightMargin = dp(4);
+        side.addView(note, nl);
+        head.addView(side, new LinearLayout.LayoutParams(WRAP, WRAP));
         column.addView(head, new LinearLayout.LayoutParams(MATCH, WRAP));
 
         apps = new Row(Catalog.APPS, getString(R.string.row_apps), column);
@@ -577,6 +595,9 @@ public final class Home extends Activity {
         render(inputs);
         background();
         styleClock();
+        String text = cfg.get("note", "").trim();
+        note.setText(text);
+        note.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         tick();
         loadWeather();
     }

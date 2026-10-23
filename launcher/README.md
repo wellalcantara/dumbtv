@@ -120,6 +120,8 @@ background=black
 dim=40
 # off visit hourly daily daytime (visit = every return to the home screen)
 rotate=off
+# a line of your own under the Options and settings chips, right-aligned (none by default)
+note=
 # on off: the weather pill, and the Open-Meteo line under it
 weather=on
 credit=on
