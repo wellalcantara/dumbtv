@@ -367,6 +367,13 @@ public final class Home extends Activity {
                 }
             }
         }
+        // The weather pill is not focusable, so nothing would scroll to it under a grid taller
+        // than the screen: it belongs to the last block, and reaching the last line shows it.
+        if (!rows.isEmpty() && pill != null && pill.getVisibility() == View.VISIBLE) {
+            View end = credit.getVisibility() == View.VISIBLE ? credit : pill;
+            int[] last = rows.get(rows.size() - 1);
+            last[1] = Math.max(last[1], topIn(end, content) + end.getHeight() + dp(8));
+        }
         return rows;
     }
 
